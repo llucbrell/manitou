@@ -1,0 +1,153 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+
+<a href="/logout" class="button is-danger" style="float:right">Salir</a>
+<a href="/chats" class="button is-warning" style="float:right; margin-right: 4px">Cancelar</a>
+
+<img src="/images/manitou.png" alt="Icono" style="width: 60px; float:left;">
+<div style="text-align: center;">
+<h2 class="title">{{#if chat._id}}Edita{{else}}Crea{{/if}} la Configuración del Enpoint</h2>
+</div>
+<div style="padding: 3%;">
+<form action="/chats/{{#if chat._id}}edit/{{this.chat._id}}{{else}}new{{/if}}" method="post" class="box">
+<div style="padding: 2%">
+</div>
+    <div class="field">
+        <label class="label" for="chatId">Id:</label>
+        <div class="control">
+            <input class="input" type="text" id="chatId" name="chatId" value="{{chat.chatId}}" readonly required>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label" for="chatName" required>Nombre:</label>
+        <div class="control">
+            <input class="input" type="text" id="chatName" name="name" value="{{this.chat.name}}" required>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label" for="chatNotes">Notas, finalidad:</label>
+        <div class="control">
+            <textarea class="textarea" id="chatNotes" name="notes">{{this.chat.notes}}</textarea>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Configuración:</label>
+        <div class="control">
+            <textarea class="textarea" id="config-json" name="configuration">{{json this.chat.configuration}}</textarea>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Código Lang-Chain:</label>
+        <div class="control">
+            <textarea class="textarea" id="code-snippet" name="codeSnippet">{{chat.codeSnippet}}</textarea>
+        </div>
+    </div>
+    <div class="field">
+        <div class="control" style="padding: 3%;">
+            <button type="submit" class="button is-success">{{#if chat._id}}Guardar{{else}}Crear{{/if}}</button>
+            <a href="/chats" class="button is-warning" style="float:right; margin-right: 4px">Cancelar</a>
+        </div>
+    </div>
+    <!--
+    <pre>{{json chat}}</pre>
+    -->
+
+</form>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsonlint-mod@1.7.0/lib/jsonlint.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/json-lint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jshint/2.12.0/jshint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/javascript-lint.min.js"></script>
+<!--
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/json/json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/json/json.min.js"></script>
+-->
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+    var form = document.querySelector('form');
+    var editorJSON = CodeMirror.fromTextArea(document.getElementById('config-json'), {
+        mode: "application/json", // Modo JSON
+        lineNumbers: true,
+        theme: "default",
+        lineWrapping: true,
+        autoCloseBrackets: true,
+        lint: true, 
+        lint: {
+            getAnnotations: CodeMirror.lint.json
+        },
+        gutters: ["CodeMirror-lint-markers"],
+        matchBrackets: true
+    });
+
+ // Formatea automáticamente el JSON al cargar
+    function formatJSONEditor() {
+        try {
+            var currentJson = editorJSON.getValue();
+            var formattedJson = JSON.stringify(JSON.parse(currentJson), null, 4);
+            editorJSON.setValue(formattedJson);
+        } catch (error) {
+            console.error("Error formateando JSON:", error);
+        }
+    }
+
+    // Llama a la función de formateo después de inicializar el editor
+    formatJSONEditor();
+
+// Función para validar que la configuración no esté vacía
+        function validateConfiguration() {
+            if (editorJSON.getValue().trim() === '') {
+                alert('Rellene la configuración');
+                return false;
+            }
+            try{
+                let parsed = JSON.parse(editorJSON.getValue().trim());
+            }catch (error){
+                alert('Error en la configuración, por favor, revise que todo esté correcto.');
+                return false;
+            }
+            return true;
+        }
+
+        // Evento que intercepta el envío del formulario
+        form.addEventListener('submit', function(event) {
+            if (!validateConfiguration()) {
+                event.preventDefault(); // Evitar que se envíe el formulario
+            }
+        });
+    });
+
+
+    var editorCode = CodeMirror.fromTextArea(document.getElementById('code-snippet'), {
+        mode: "text/javascript", // Modo JavaScript
+        lineNumbers: true,
+        theme: "default",
+        lineWrapping: true,
+        autoCloseBrackets: true,
+        lint: true, 
+        gutters: ["CodeMirror-lint-markers"],
+        matchBrackets: true
+    });
+
+    // Asegúrate de que solo se ejecuta cuando es un chat nuevo (no hay _id)
+    window.addEventListener('DOMContentLoaded', (event) => {
+        if (!document.getElementById('chatId').value) {
+            document.getElementById('chatId').value = uuid.v4();
+        }
+    });
+
+</script>

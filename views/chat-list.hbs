@@ -1,0 +1,85 @@
+
+<img src="/images/manitou.png" alt="Icono" style="width: 60px; float:left;">
+<a href="/logout" class="button is-danger" style="float:right">Salir</a>
+
+<div style="padding: 3%; text-align: center;">
+<h1 class="title">Endpoints</h1>
+ <form id="importForm" action="/chats/import" method="POST" enctype="multipart/form-data" style="display: inline; float:right">
+        <input type="file" id="chatsFile" name="chatsFile" accept=".json" style="display: none;" required>
+        <button type="button" class="button is-primary" onclick="document.getElementById('chatsFile').click();">Importar</button>
+    </form>
+<a href="/chats/new" class="button is-primary" style="float:right; margin-right: 4px">+</a>
+<table class="table is-striped is-fullwidth" style="text-align: left;">
+    <thead>
+        <tr>
+            <th>Url</th>
+            <th>Nombre</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each chats}}
+        <tr>
+            <td style="text-align:center">
+                <button onclick="copyToClipboard('{{@root.baseUrl}}{{this.chatId}}', this)" class="button is-small is-primary" data-btn-type="url" style="float:left; margin-right: 4px">url</button>
+                <button onclick="copyToClipboard('{{@root.endpointUrl}}{{this.chatId}}', this)" class="button is-small is-primary" data-btn-type="endpoint" style="float:left">endpt</button>
+                <!--
+                <span >{{@root.baseUrl}}{{this.chatId}}</span>
+                -->
+                <span >{{this.chatId}}</span>
+            </td>
+            <td title="{{this.notes}}">{{this.name}}</td>
+            <td>
+                <a href="{{@root.chatUrl}}{{this.chatId}}" target="_blank" style="float:left; margin-right: 4px"  class="button is-small is-warning">Ir</a>
+                <a href="/chats/edit/{{this._id}}" class="button is-small is-link">Editar</a>
+                <a href="/chats/export/{{this._id}}" class="button is-small is-info">Exportar</a>
+                <form method="POST" action="/chats/delete/{{this._id}}" style="display:inline;">
+                    <button type="submit" class="button is-small is-danger">Borrar</button>
+                </form>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+</div>
+
+<footer>
+<div style="padding: 3%; text-align: center;">
+    @Manitou MIT Licensed
+</div>
+</footer>
+
+
+<script>
+function copyToClipboard(text, button) {
+    // Crea un elemento textarea temporal
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    // Selecciona el contenido del textarea
+    textarea.select();
+    // Copia el texto seleccionado
+    document.execCommand('copy');
+    // Elimina el textarea temporal
+    document.body.removeChild(textarea);
+    // Cambia el botón a verde, actualiza el texto a 'Hecho'
+    button.classList.add('is-success');
+    button.textContent = 'Hecho';
+    // Restablece el botón después de 1.5 segundos
+    setTimeout(function() {
+        button.classList.remove('is-success');
+        // Restablece el texto basado en el tipo de botón
+        if (button.dataset.btnType === 'url') {
+            button.textContent = 'url';
+        } else if (button.dataset.btnType === 'endpoint') {
+            button.textContent = 'endpt';
+        }
+    }, 1500);
+}
+</script>
+
+<script>
+document.getElementById('chatsFile').addEventListener('change', function() {
+    document.getElementById('importForm').submit();
+});
+</script>

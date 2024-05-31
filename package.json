@@ -1,0 +1,36 @@
+{
+  "name": "samaqsama",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@handlebars/allow-prototype-access": "^1.0.5",
+    "@langchain/community": "^0.0.55",
+    "@langchain/core": "^0.1.62",
+    "axios": "^1.6.8",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "codemirror": "^6.0.1",
+    "connect-mongo": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-fileupload": "^1.5.0",
+    "express-handlebars": "^7.1.2",
+    "express-session": "^1.18.0",
+    "handlebars": "^4.7.8",
+    "langchain": "^0.1.36",
+    "mongoose": "^8.3.3",
+    "nodemailer": "^6.9.13",
+    "require-from-string": "^2.0.2",
+    "uuid": "^9.0.1",
+    "vm2": "^3.9.19"
+  }
+}
